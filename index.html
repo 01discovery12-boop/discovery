@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Discover Bank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div id="app">
+      <section id="splash" class="page active">
+        <div class="splash-container">
+          <div class="logo-container">
+            <div class="discover-logo">
+              <span class="logo-text">DISC</span><span class="logo-circle"></span><span class="logo-text">VER</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="login" class="page">
+        <div class="login-container">
+          <div class="login-header">
+            <div class="discover-logo-small">
+              <span class="logo-text">DISC</span><span class="logo-circle-small"></span><span class="logo-text">VER</span>
+            </div>
+          </div>
+
+          <form id="loginForm" class="login-form">
+            <div class="form-group">
+              <label for="userId">User ID</label>
+              <input type="text" id="userId" value="Bella Alex" autocomplete="username" />
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="remember" checked />
+              <label for="remember">Remember</label>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" />
+            </div>
+
+            <button type="button" class="btn-faceid">
+              <i class="fas fa-fingerprint"></i>
+              <span>Face ID</span>
+            </button>
+
+            <button type="submit" class="btn-primary">Log In</button>
+
+            <div class="login-links">
+              <a href="#" class="link">Log in with Passcode</a>
+              <a href="#" class="link">Need help logging in?</a>
+            </div>
+          </form>
+
+          <div class="login-footer">
+            <div class="footer-info">
+              <span>Version 2518.1 | </span>
+              <a href="#" class="link">Privacy & Terms</a>
+            </div>
+            <p class="copyright">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="dashboard" class="page">
+        <div class="page-header">
+          <div class="discover-logo-header">
+            <span class="logo-text">DISC</span><span class="logo-circle-small"></span><span class="logo-text">VER</span>
+          </div>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <div class="account-card">
+            <div class="account-info">
+              <h2>CASHBACK DEBIT</h2>
+              <p class="account-number">(...8179)</p>
+            </div>
+            <button class="btn-link" data-navigate="balance">View Account Details <i class="fas fa-chevron-right"></i></button>
+          </div>
+
+          <div class="money-tools-card">
+            <div class="money-tools-icons">
+              <div class="tool-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="tool-icon">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+              <div class="tool-icon">
+                <i class="fas fa-chart-pie"></i>
+              </div>
+              <div class="tool-icon">
+                <i class="fas fa-chart-bar"></i>
+              </div>
+            </div>
+            <h3>Discover Money Tools</h3>
+            <p>Get free daily insights and budget tools to help you bank better.</p>
+            <button class="btn-get-started">Get Started</button>
+          </div>
+
+          <div class="cashback-bonus-card">
+            <div class="cashback-bonus-header">
+              <div class="cashback-icon-text">
+                <i class="fas fa-circle-notch"></i>
+                <h3>Cashback Bonus®</h3>
+              </div>
+              <button class="btn-redeem">Redeem</button>
+            </div>
+            <div class="cashback-balance-info">
+              <p class="cashback-label">Cashback Bonus® Balance</p>
+              <p class="cashback-amount">$3,000,000.00</p>
+            </div>
+            <button class="btn-view-activity">View Activity</button>
+          </div>
+
+          <div class="add-money-card">
+            <div class="add-money-icon">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <h3>Add money to your account</h3>
+            <p>Fund now to enjoy the features and benefits of your account.</p>
+            <button class="btn-transfer-funds" data-navigate="deposit">Transfer Funds</button>
+          </div>
+
+          <div class="dashboard-footer">
+            <div class="footer-links-row">
+              <a href="#" class="footer-link">Privacy & Terms</a>
+              <span class="separator">|</span>
+              <a href="#" class="footer-link">Provide Feedback</a>
+            </div>
+            <div class="fdic-section">
+              <div class="fdic-logo">
+                <i class="fas fa-home"></i>
+                <div class="fdic-text-small">
+                  <span>Member</span>
+                  <strong>FDIC</strong>
+                </div>
+              </div>
+            </div>
+            <p class="copyright-small">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item active" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="deposit" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h1>Deposit</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <h2 class="page-title">Decide how you want to deposit</h2>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="option-content">
+              <h3>Mobile Check Deposit</h3>
+              <p>Deposit checks by taking a photo with your mobile device</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-university"></i>
+            </div>
+            <div class="option-content">
+              <h3>Direct Deposit</h3>
+              <p>Set up direct deposit from your employer</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-money-bill"></i>
+            </div>
+            <div class="option-content">
+              <h3>Add Cash</h3>
+              <p>Deposit cash at participating retailers</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item active" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="balance" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <div class="discover-logo-header">
+            <span class="logo-text">DISC</span><span class="logo-circle-small"></span><span class="logo-text">VER</span>
+          </div>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content dark-bg">
+          <div class="balance-header-dark">
+            <h2 class="account-name-dark">CASHBACK DEBIT (8179)</h2>
+            <div class="balance-amount-dark">$3,000,000.00</div>
+            <p class="balance-label-dark">Available Balance</p>
+            <div class="current-balance">
+              <span>Current Balance</span>
+              <span>$3,000,000.00 <i class="fas fa-question-circle"></i></span>
+            </div>
+            <button class="btn-outline-white">Open an Online Savings Account</button>
+          </div>
+
+          <div class="promo-card-white">
+            <h3>Guaranteed returns with a CD</h3>
+            <p>A high-yield CD can help you save with returns you can count on.</p>
+            <button class="btn-outline-primary">Open a CD</button>
+          </div>
+
+          <div class="activity-section">
+            <div class="activity-tabs">
+              <button class="tab active">Activity</button>
+              <button class="tab">Scheduled</button>
+            </div>
+
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-info">
+                  <h4>Returned Check Deposit</h4>
+                  <p>May 10, 2024</p>
+                </div>
+                <div class="activity-amount negative">-$200.00</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-info">
+                  <h4>Check Deposit</h4>
+                  <p>May 8, 2024</p>
+                </div>
+                <div class="activity-amount positive">$200.00</div>
+              </div>
+               <div class="activity-item">
+                <div class="activity-info">
+                  <h4>Check Deposit</h4>
+                  <p>May 8, 2024</p>
+                </div>
+                <div class="activity-amount positive">$400.00</div>
+              </div>
+
+              <button class="btn-link-center view-more">View More</button>
+            </div>
+          </div>
+
+          <div class="info-links">
+            <a href="#" class="info-link-white">
+              <i class="fas fa-shield-alt"></i>
+              <span>Online Privacy Protection</span>
+              <i class="fas fa-chevron-right"></i>
+            </a>
+            <a href="#" class="info-link-white">
+              <i class="fab fa-cc-discover"></i>
+              <span>Send Money with Zelle</span>
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item active" data-navigate="balance">
+            <i class="fas fa-bars"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-envelope"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="pay" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h1>Welcome to Bill Pay</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content billpay-content">
+          <div class="billpay-illustration">
+            <div class="bill-graphic">
+              <div class="bill-line long"></div>
+              <div class="bill-line short"></div>
+              <div class="bill-item">
+                <div class="bill-text"></div>
+                <span class="bill-dollar">$</span>
+              </div>
+              <div class="bill-item">
+                <div class="bill-text short"></div>
+                <span class="bill-dollar">$</span>
+              </div>
+              <div class="bill-item">
+                <div class="bill-text"></div>
+                <span class="bill-dollar">$</span>
+              </div>
+              <div class="bill-item">
+                <div class="bill-text"></div>
+                <span class="bill-dollar">$</span>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="billpay-title">Bill Pay is better than ever</h2>
+          <p class="billpay-description">Take care of business from anywhere, at any time, with Bill Pay's streamlined experience.</p>
+          <p class="billpay-cta">Swipe to get the details.</p>
+
+          <div class="carousel-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+
+          <div class="page-footer-centered">
+            <div class="footer-links">
+              <a href="#" class="link">Privacy & Terms</a>
+              <span> | </span>
+              <a href="#" class="link">Provide Feedback</a>
+            </div>
+            <div class="fdic-logos">
+              <i class="fas fa-home"></i>
+              <span class="fdic-text">Member<br><strong>FDIC</strong></span>
+            </div>
+            <p class="copyright">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item active" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="profile" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="more">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h1>Profile</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <div class="profile-section">
+            <div class="profile-label">
+              <span>Name</span>
+              <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="profile-value">LEANNA JO LUNDBERG</div>
+          </div>
+
+          <div class="profile-section">
+            <div class="profile-label">Home Number</div>
+            <div class="profile-value">763-620-6379</div>
+          </div>
+
+          <div class="profile-section">
+            <div class="profile-label">Email</div>
+            <div class="profile-value">leandav2014@gmail.com</div>
+          </div>
+
+          <div class="profile-section">
+            <div class="profile-label">Home Address</div>
+            <div class="profile-value">5324 60TH AVE<br>PRINCETON, MN 55371-6420</div>
+          </div>
+
+          <button class="btn-primary full-width">Edit</button>
+
+          <div class="page-footer-centered">
+            <div class="footer-links">
+              <a href="#" class="link">Privacy & Terms</a>
+              <span> | </span>
+              <a href="#" class="link">Provide Feedback</a>
+            </div>
+            <div class="fdic-logos">
+              <i class="fas fa-home"></i>
+              <span class="fdic-text">Member<br><strong>FDIC</strong></span>
+            </div>
+            <p class="copyright">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="more" class="page">
+        <div class="page-header">
+          <i class="fas fa-bell header-icon"></i>
+          <h1>More</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <div class="settings-card">
+            <div class="settings-item" data-navigate="profile">
+              <span>Face ID</span>
+              <div class="settings-right">
+                <span class="status-on">ON</span>
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+            <div class="settings-item-divider"></div>
+            <div class="settings-item">
+              <span>Manage Third-Party Access</span>
+              <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-header">
+              <i class="fas fa-cog"></i>
+              <h3>Mobile Settings</h3>
+            </div>
+
+            <div class="settings-toggle-item">
+              <div>
+                <h4>Quick View</h4>
+                <p>See account balance(s) from your login screen.</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-toggle-item">
+              <div>
+                <h4>Widget</h4>
+                <p>See your account details from your Notification Center or Home Screen.</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="promo-card-accent">
+            <div class="promo-icon">
+              <i class="fas fa-university"></i>
+            </div>
+            <h3>Open An Account</h3>
+            <p>Credit Cards, Cashback Debit, Online Savings Account, Personal Loans, Money Market, and more.</p>
+            <button class="btn-outline-primary">View Accounts</button>
+          </div>
+
+          <div class="page-footer-centered">
+            <div class="footer-links">
+              <a href="#" class="link">Privacy & Terms</a>
+              <span> | </span>
+              <a href="#" class="link">Provide Feedback</a>
+            </div>
+            <div class="fdic-logos">
+              <i class="fas fa-home"></i>
+              <span class="fdic-text">Member<br><strong>FDIC</strong></span>
+            </div>
+            <p class="copyright">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="balance">
+            <i class="fas fa-bars"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-envelope"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item active" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="transfer" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h1>Transfer</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <h2 class="page-title">Choose your transfer type</h2>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="option-content">
+              <h3>Between My Accounts</h3>
+              <p>Transfer money between your Discover accounts</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-university"></i>
+            </div>
+            <div class="option-content">
+              <h3>To Another Bank</h3>
+              <p>Transfer to an external account</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="option-content">
+              <h3>To Someone Else</h3>
+              <p>Send money to friends and family</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="balance">
+            <i class="fas fa-bars"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item active" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-envelope"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="script.js"></script>
+    <script src="advanced.js"></script>
+  </body>
+</html>
+
+
+
+
+
