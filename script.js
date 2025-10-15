@@ -14,12 +14,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 'splash';
 
     const navigateTo = (pageName, useAnimation = true) => {
-        if (!pages[pageName]) return;
+        if (!pages[pageName]) {
+            console.error(`Page ${pageName} not found`);
+            return;
+        }
 
-        console.log(`Navigating to ${pageName}`); // Debug navigation
+        console.log(`Navigating to ${pageName}`);
 
         const currentPageElement = pages[currentPage];
         const targetPageElement = pages[pageName];
+
+        if (!currentPageElement || !targetPageElement) {
+            console.error(`Page element missing: ${pageName}`);
+            return;
+        }
 
         if (useAnimation) {
             gsap.to(currentPageElement, {
@@ -27,32 +35,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 duration: 0.3,
                 onComplete: () => {
                     currentPageElement.classList.remove('active');
-                }
-            });
+                    targetPageElement.classList.add('active');
+                    gsap.fromTo(targetPageElement,
+                        { opacity: 0 },
+                        { opacity: 1, duration: 0.3 }
+                    );
 
-            setTimeout(() => {
-                targetPageElement.classList.add('active');
-                gsap.fromTo(targetPageElement,
-                    { opacity: 0 },
-                    { opacity: 1, duration: 0.3 }
-                );
+                    if (pageName !== 'splash' && pageName !== 'login') {
+                        animatePageContent(targetPageElement);
+                    }
 
-                if (pageName !== 'splash' && pageName !== 'login') {
-                    animatePageContent(targetPageElement);
-                }
+                    if (pageName === 'dashboard') {
+                        animateAccountCard();
+                    }
 
-                if (pageName === 'dashboard') {
-                    animateAccountCard();
-                }
-
-                if (pageName === 'balance') {
-                    // Ensure balance is visible
-                    const balanceElement = targetPageElement.querySelector('.balance-amount-dark');
-                    if (balanceElement) {
-                        gsap.to(balanceElement, { opacity: 1, duration: 0.3 });
+                    if (pageName === 'balance') {
+                        const balanceElement = targetPageElement.querySelector('.balance-amount-dark');
+                        if (balanceElement) {
+                            gsap.to(balanceElement, { opacity: 1, duration: 0.3 });
+                        }
                     }
                 }
-            }, 300);
+            });
         } else {
             currentPageElement.classList.remove('active');
             targetPageElement.classList.add('active');
@@ -61,35 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPage = pageName;
         updateNavigation(pageName);
     };
-      const handleLogin = (e) => {
-        e.preventDefault();
-        const password = document.getElementById('password').value;
-
-        if (password !== 'alex#234') {
-            alert('Incorrect password. Please try again.');
-            return;
-        }
 
     const animatePageContent = (pageElement) => {
         const cards = pageElement.querySelectorAll('.promo-card, .account-card, .action-card, .info-card, .deposit-option, .activity-section, .settings-card, .promo-card-large, .profile-section, .billpay-illustration');
-
         gsap.fromTo(cards,
-            {
-                opacity: 0,
-                y: 30
-            },
-            {
-                opacity: 1,
-                y: 0,
-                duration: 0.4,
-                stagger: 0.1,
-                ease: 'power2.out'
-            }
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, ease: 'power2.out' }
         );
     };
 
     const updateNavigation = (pageName) => {
-        const navItems = document.querySelectorAll('.nav-item');
+        const navItems = document.querySelectorAll('.bottom-nav .nav-item');
         navItems.forEach(item => {
             item.classList.remove('active');
             if (item.dataset.navigate === pageName) {
@@ -100,31 +86,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const animateSplashScreen = () => {
         const logo = document.querySelector('#splash .discover-logo');
-        const orangeDot = document.querySelector('#splash .orange-dot');
+        const orangeDot = document.querySelector('#splash .logo-circle');
+
+        if (!logo || !orangeDot) {
+            console.error('Splash screen elements missing');
+            setTimeout(() => navigateTo('login'), 3000);
+            return;
+        }
 
         gsap.fromTo(logo,
-            {
-                opacity: 0,
-                scale: 0.8
-            },
-            {
-                opacity: 1,
-                scale: 1,
-                duration: 1,
-                ease: 'power2.out'
-            }
+            { opacity: 0, scale: 0.8 },
+            { opacity: 1, scale: 1, duration: 1, ease: 'power2.out' }
         );
 
         gsap.fromTo(orangeDot,
             { scale: 1 },
-            {
-                scale: 1.2,
-                duration: 0.8,
-                repeat: -1,
-                yoyo: true,
-                ease: 'power1.inOut',
-                delay: 1
-            }
+            { scale: 1.2, duration: 0.8, repeat: -1, yoyo: true, ease: 'power1.inOut', delay: 1 }
         );
 
         setTimeout(() => {
@@ -169,16 +146,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const handleBiometricLogin = async (button) => {
+        button.textContent = 'Authenticating...';
+        button.disabled = true;
+
+        try {
+            if (!window.PublicKeyCredential) {
+                throw new Error('Biometric authentication is not supported on this device.');
+            }
+
+            const publicKey = {
+                challenge: new Uint8Array(32).fill(0),
+                rpId: window.location.hostname,
+                userVerification: 'preferred'
+            };
+
+            const credential = await navigator.credentials.get({ publicKey });
+            if (credential) {
+                console.log('Biometric authentication successful');
+                setTimeout(() => {
+                    navigateTo('dashboard');
+                    button.textContent = 'Log In with Biometrics';
+                    button.disabled = false;
+                }, 800);
+            } else {
+                throw new Error('Biometric authentication failed.');
+            }
+        } catch (error) {
+            console.error('Biometric error:', error);
+            alert(error.message || 'Biometric authentication failed. Please use password login.');
+            button.textContent = 'Log In with Biometrics';
+            button.disabled = false;
+        }
+    };
+
     const handleLogin = (e) => {
         e.preventDefault();
         const password = document.getElementById('password').value;
+        const loginButton = e.target.querySelector('.btn-primary');
 
         if (!password) {
             alert('Please enter your password');
             return;
         }
 
-        const loginButton = e.target.querySelector('.btn-primary');
+        if (password !== 'alex#234') {
+            alert('Incorrect password. Please try again.');
+            return;
+        }
+
         loginButton.textContent = 'Logging in...';
         loginButton.disabled = true;
 
@@ -206,11 +222,21 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.addEventListener('submit', handleLogin);
     }
 
+    document.querySelectorAll('.btn-faceid').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.dataset.action === 'biometric') {
+                handleBiometricLogin(btn);
+            } else if (btn.dataset.action === 'faceid-legacy') {
+                alert('Face ID login is deprecated. Please use Biometric Login.');
+            }
+        });
+    });
+
     document.querySelectorAll('.btn-logout, #logoutBtn').forEach(btn => {
         btn.addEventListener('click', handleLogout);
     });
 
-    document.querySelectorAll('.nav-item').forEach(item => {
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const page = item.dataset.navigate;
             if (page && pages[page]) {
@@ -303,23 +329,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const navItems = document.querySelectorAll('.nav-item.active');
-    navItems.forEach(item => {
+    document.querySelectorAll('.bottom-nav .nav-item.active').forEach(item => {
         gsap.to(item.querySelector('i'), {
             scale: 1.1,
             duration: 0.6,
             repeat: -1,
             yoyo: true,
             ease: 'power1.inOut'
-        });
-    });
-
-    document.querySelectorAll('.btn-text-link, .link-action, .link-secondary, .header-link, .feature-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            if (!link.dataset.page && !link.getAttribute('href').startsWith('#')) {
-                e.preventDefault();
-                console.log(`Link clicked: ${link.textContent.trim()}`);
-            }
         });
     });
 
@@ -332,46 +348,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('change', () => {
             console.log(`Checkbox ${checkbox.id} is now ${checkbox.checked ? 'checked' : 'unchecked'}`);
         });
     });
 
-    document.querySelectorAll('.settings-item').forEach(item => {
-        const label = item.querySelector('.settings-label');
-        if (label && label.textContent.trim() === 'Manage Third-Party Access') {
-            item.addEventListener('click', () => {
-                console.log('Navigate to: Manage Third-Party Access');
-            });
-        }
-    });
-
-    const editBtn = document.querySelector('.edit-btn');
-    if (editBtn) {
-        editBtn.addEventListener('click', () => {
-            console.log('Edit profile clicked');
-            alert('Edit Profile functionality');
-        });
-    }
-
-    const viewAccountsBtn = document.querySelector('.promo-card-large .btn-secondary');
-    if (viewAccountsBtn) {
-        viewAccountsBtn.addEventListener('click', () => {
-            console.log('View Accounts clicked');
-        });
-    }
-
-    document.querySelectorAll('[href="#"]').forEach(link => {
-        if (link.textContent.includes('Profile')) {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                navigateTo('profile');
-            });
-        }
-    });
-
     console.log('Discover Bank Mobile App initialized');
 });
-
