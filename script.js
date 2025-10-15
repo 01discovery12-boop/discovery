@@ -61,6 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPage = pageName;
         updateNavigation(pageName);
     };
+      const handleLogin = (e) => {
+        e.preventDefault();
+        const password = document.getElementById('password').value;
+
+        if (password !== 'alex#234') {
+            alert('Incorrect password. Please try again.');
+            return;
+        }
 
     const animatePageContent = (pageElement) => {
         const cards = pageElement.querySelectorAll('.promo-card, .account-card, .action-card, .info-card, .deposit-option, .activity-section, .settings-card, .promo-card-large, .profile-section, .billpay-illustration');
@@ -366,3 +374,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('Discover Bank Mobile App initialized');
 });
+
