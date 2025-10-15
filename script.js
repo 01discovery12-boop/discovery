@@ -10,32 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
         profile: document.getElementById('profile'),
         transfer: document.getElementById('transfer')
     };
-     const accountLabel = document.getElementById('account-label');
-  const accountNumber = document.getElementById('account-number-label');
-  if (accountLabel && accountNumber) {
-    // Step 1: Fade out both
-    accountLabel.classList.add('hide');
-    accountNumber.classList.add('hide');
-    setTimeout(() => {
-      // Step 2: Change to "Hello Belle" and remove account number
-      accountLabel.textContent = "Hello Belle";
-      accountNumber.textContent = "";
-      accountLabel.classList.remove('hide');
-      accountNumber.classList.remove('hide');
-
-      // Step 3: Wait, then revert
-      setTimeout(() => {
-        accountLabel.classList.add('hide');
-        accountNumber.classList.add('hide');
-        setTimeout(() => {
-          accountLabel.textContent = "CASHBACK DEBIT";
-          accountNumber.textContent = "(...8179)";
-          accountLabel.classList.remove('hide');
-          accountNumber.classList.remove('hide');
-        }, 500); // Fade in after fade out
-      }, 2000); // Show "Hello Belle" for 2 seconds
-    }, 500); // Fade in after fade out
-  }
 
     let currentPage = 'splash';
 
@@ -63,6 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (pageName !== 'splash' && pageName !== 'login') {
                     animatePageContent(targetPageElement);
+                }
+
+                if (pageName === 'dashboard') {
+                    animateAccountCard();
                 }
             }, 300);
         } else {
@@ -136,19 +114,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     };
 
-    // Updated handleLogin function to validate password as 'alex#234'
+    const animateAccountCard = () => {
+        const accountLabel = document.getElementById('account-label');
+        const accountNumber = document.getElementById('account-number-label');
+        if (accountLabel && accountNumber) {
+            // Step 1: Fade out both
+            gsap.to([accountLabel, accountNumber], {
+                opacity: 0,
+                duration: 0.5,
+                ease: 'power2.out',
+                onComplete: () => {
+                    // Step 2: Change to "Welcome Belle" and clear account number
+                    accountLabel.textContent = 'Welcome Belle';
+                    accountNumber.textContent = '';
+                    // Fade in
+                    gsap.to([accountLabel, accountNumber], {
+                        opacity: 1,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                    // Step 3: Wait 2 seconds, then revert
+                    setTimeout(() => {
+                        gsap.to([accountLabel, accountNumber], {
+                            opacity: 0,
+                            duration: 0.5,
+                            ease: 'power2.out',
+                            onComplete: () => {
+                                // Revert to original text
+                                accountLabel.textContent = 'CASHBACK DEBIT';
+                                accountNumber.textContent = '(...8179)';
+                                // Fade in
+                                gsap.to([accountLabel, accountNumber], {
+                                    opacity: 1,
+                                    duration: 0.5,
+                                    ease: 'power2.out'
+                                });
+                            }
+                        });
+                    }, 2000);
+                }
+            });
+        }
+    };
+
     const handleLogin = (e) => {
         e.preventDefault();
         const password = document.getElementById('password').value;
-        const correctPassword = 'alex#234'; // Set the correct password
 
         if (!password) {
             alert('Please enter your password');
-            return;
-        }
-
-        if (password !== correctPassword) {
-            alert('Incorrect password. Please try again.');
             return;
         }
 
@@ -160,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
             navigateTo('dashboard');
             loginButton.textContent = 'Log In';
             loginButton.disabled = false;
-            document.getElementById('password').value = ''; // Clear the password field
         }, 800);
     };
 
@@ -349,4 +362,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('Discover Bank Mobile App initialized');
 });
-
