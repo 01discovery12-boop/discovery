@@ -58,7 +58,6 @@ class DiscoverApp {
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-
         if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
         if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
       }
@@ -318,39 +317,38 @@ class DiscoverApp {
 
   initBalanceCounter() {
     const balanceElements = document.querySelectorAll('.balance-amount, .balance-amount-dark, .balance');
-
     balanceElements.forEach(element => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            this.animateCounter(element);
-            observer.unobserve(element);
-          }
-        });
-      });
+      const targetText = element.textContent;
+      if (!targetText) return;
 
-      observer.observe(element);
-    });
-  }
-
-  animateCounter(element) {
-    const targetText = element.textContent;
-    const match = targetText.match(/[\d,]+\.?\d*/);
-
-    if (!match) return;
-
-    const targetValue = parseFloat(match[0].replace(/,/g, ''));
-    const prefix = targetText.substring(0, targetText.indexOf(match[0]));
-    const suffix = targetText.substring(targetText.indexOf(match[0]) + match[0].length);
-
-    gsap.from({ value: 0 }, {
-      value: targetValue,
-      duration: 2,
-      ease: 'power1.out',
-      onUpdate: function() {
-        const currentValue = this.targets()[0].value;
-        element.textContent = prefix + currentValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + suffix;
+      const match = targetText.match(/[\d,]+\.?\d*/);
+      if (!match) {
+        // Fallback: ensure element is visible with original text
+        gsap.to(element, { opacity: 1, duration: 0.3 });
+        return;
       }
+
+      const targetValue = parseFloat(match[0].replace(/,/g, ''));
+      const prefix = targetText.substring(0, targetText.indexOf(match[0]));
+      const suffix = targetText.substring(targetText.indexOf(match[0]) + match[0].length);
+
+      // Ensure initial visibility
+      element.style.opacity = '1';
+
+      gsap.from({ value: 0 }, {
+        value: targetValue,
+        duration: 2,
+        ease: 'power1.out',
+        onUpdate: function() {
+          const currentValue = this.targets()[0].value;
+          element.textContent = prefix + currentValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + suffix;
+        },
+        onComplete: () => {
+          // Ensure final value is set and visible
+          element.textContent = prefix + targetValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + suffix;
+          gsap.to(element, { opacity: 1, duration: 0.3 });
+        }
+      });
     });
   }
 
