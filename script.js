@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const navigateTo = (pageName, useAnimation = true) => {
         if (!pages[pageName]) return;
 
+        console.log(`Navigating to ${pageName}`); // Debug navigation
+
         const currentPageElement = pages[currentPage];
         const targetPageElement = pages[pageName];
 
@@ -41,6 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (pageName === 'dashboard') {
                     animateAccountCard();
+                }
+
+                if (pageName === 'balance') {
+                    // Ensure balance is visible
+                    const balanceElement = targetPageElement.querySelector('.balance-amount-dark');
+                    if (balanceElement) {
+                        gsap.to(balanceElement, { opacity: 1, duration: 0.3 });
+                    }
                 }
             }, 300);
         } else {
@@ -118,32 +128,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const accountLabel = document.getElementById('account-label');
         const accountNumber = document.getElementById('account-number-label');
         if (accountLabel && accountNumber) {
-            // Step 1: Fade out both
             gsap.to([accountLabel, accountNumber], {
                 opacity: 0,
                 duration: 0.5,
                 ease: 'power2.out',
                 onComplete: () => {
-                    // Step 2: Change to "Welcome Belle" and clear account number
                     accountLabel.textContent = 'Welcome Belle';
                     accountNumber.textContent = '';
-                    // Fade in
                     gsap.to([accountLabel, accountNumber], {
                         opacity: 1,
                         duration: 0.5,
                         ease: 'power2.out'
                     });
-                    // Step 3: Wait 2 seconds, then revert
                     setTimeout(() => {
                         gsap.to([accountLabel, accountNumber], {
                             opacity: 0,
                             duration: 0.5,
                             ease: 'power2.out',
                             onComplete: () => {
-                                // Revert to original text
                                 accountLabel.textContent = 'CASHBACK DEBIT';
                                 accountNumber.textContent = '(...8179)';
-                                // Fade in
                                 gsap.to([accountLabel, accountNumber], {
                                     opacity: 1,
                                     duration: 0.5,
