@@ -1452,6 +1452,14 @@ body {
 .separator {
   color: var(--text-gray);
 }
+/* Add this to your CSS file (recommend placing near other .account-card rules) */
+.account-label-animated, .account-number-animated {
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+.account-label-animated.hide, .account-number-animated.hide {
+  opacity: 0;
+}
 
 .fdic-section {
   display: flex;
@@ -1570,3 +1578,4 @@ body {
     transform: none;
   }
 }
+
