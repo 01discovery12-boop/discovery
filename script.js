@@ -10,6 +10,32 @@ document.addEventListener('DOMContentLoaded', () => {
         profile: document.getElementById('profile'),
         transfer: document.getElementById('transfer')
     };
+     const accountLabel = document.getElementById('account-label');
+  const accountNumber = document.getElementById('account-number-label');
+  if (accountLabel && accountNumber) {
+    // Step 1: Fade out both
+    accountLabel.classList.add('hide');
+    accountNumber.classList.add('hide');
+    setTimeout(() => {
+      // Step 2: Change to "Hello Belle" and remove account number
+      accountLabel.textContent = "Hello Belle";
+      accountNumber.textContent = "";
+      accountLabel.classList.remove('hide');
+      accountNumber.classList.remove('hide');
+
+      // Step 3: Wait, then revert
+      setTimeout(() => {
+        accountLabel.classList.add('hide');
+        accountNumber.classList.add('hide');
+        setTimeout(() => {
+          accountLabel.textContent = "CASHBACK DEBIT";
+          accountNumber.textContent = "(...8179)";
+          accountLabel.classList.remove('hide');
+          accountNumber.classList.remove('hide');
+        }, 500); // Fade in after fade out
+      }, 2000); // Show "Hello Belle" for 2 seconds
+    }, 500); // Fade in after fade out
+  }
 
     let currentPage = 'splash';
 
@@ -323,3 +349,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('Discover Bank Mobile App initialized');
 });
+
