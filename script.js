@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (password !== 'alex#234') {
+        if (password !== 'shawn@324') {
             alert('Incorrect password. Please try again.');
             return;
         }
@@ -356,4 +356,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('Discover Bank Mobile App initialized');
 });
+
 
