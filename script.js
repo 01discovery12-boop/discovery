@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 duration: 0.5,
                 ease: 'power2.out',
                 onComplete: () => {
-                    accountLabel.textContent = 'Welcome Shawn';
+                    accountLabel.textContent = 'Welcome Mike';
                     accountNumber.textContent = '';
                     gsap.to([accountLabel, accountNumber], {
                         opacity: 1,
@@ -356,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('Discover Bank Mobile App initialized');
 });
+
 
 
 
