@@ -1,438 +1,668 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Discovery - Transfer Demo</title>
-  <style>
-    :root{
-      --bg:#0f1724;
-      --card:#0b1220;
-      --muted:#9aa4b2;
-      --accent:#0ea5a4;
-      --success:#16a34a;
-      --glass: rgba(255,255,255,0.03);
-      --max-width:1100px;
-    }
-    html,body{height:100%;}
-    body{
-      margin:0;
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;
-      background: linear-gradient(180deg,#071029 0%, #081526 60%);
-      color:#e6eef6;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-    }
-    .container{
-      width:100%;
-      max-width:var(--max-width);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:12px;
-      box-shadow:0 8px 30px rgba(2,6,23,0.6);
-      padding:28px;
-      box-sizing:border-box;
-    }
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:18px;
-    }
-    header h1{font-size:20px;margin:0}
-    .top-row{display:flex;align-items:center;gap:16px}
-    .outstanding{
-      background:var(--glass);
-      padding:12px 16px;border-radius:10px;
-      display:flex;flex-direction:column;align-items:flex-end
-    }
-    .outstanding .label{font-size:12px;color:var(--muted)}
-    .outstanding .amount{font-size:18px;font-weight:600;color:#fff}
-
-    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
-      padding:18px;border-radius:10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;
-      box-shadow:0 4px 20px rgba(2,6,23,0.5);
-    }
-    .card h3{margin:0 0 8px 0;font-size:14px}
-    .card p{margin:0;color:var(--muted);font-size:13px}
-    .card .actions{display:flex;gap:8px;margin-top:12px}
-    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:8px;color:#dbeffe;cursor:pointer}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),#06b6b4);border:none;color:#042022}
-    .btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,0.04);color:var(--muted)}
-
-    /* modal */
-    .modal-backdrop{
-      position:fixed;inset:0;background:rgba(2,6,23,0.6);display:none;align-items:center;justify-content:center;z-index:40;padding:16px
-    }
-    .modal{background:linear-gradient(180deg,#071726, #081525);border-radius:12px;max-width:720px;width:100%;box-shadow:0 20px 50px rgba(2,6,23,0.7);padding:20px;color:#e8f6ff}
-    .modal .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .modal h2{margin:0;font-size:18px}
-    .close{background:transparent;border:none;color:var(--muted);font-size:18px;cursor:pointer}
-    .form-row{display:flex;gap:8px;margin-top:10px}
-    .form-group{display:flex;flex-direction:column;flex:1}
-    label{font-size:12px;color:var(--muted);margin-bottom:6px}
-    input,select,textarea{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px;color:#e6eef6}
-    textarea{min-height:80px}
-    .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
-
-    /* processing overlay */
-    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:60}
-    .overlay .card{
-      max-width:420px;padding:22px;border-radius:12px;text-align:center;background:linear-gradient(180deg,#0b1724,#071021);
-      box-shadow:0 10px 40px rgba(2,6,23,0.7);
-    }
-    .spinner{width:56px;height:56px;border-radius:50%;border:6px solid rgba(255,255,255,0.06);border-top-color:var(--accent);margin:10px auto;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .progress-bar{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;margin-top:10px}
-    .progress-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#06b6b4);transition:width 300ms ease}
-
-    /* notification modal */
-    .notify-content{display:flex;flex-direction:column;gap:12px}
-    .notify-amount{font-weight:700;color:#fff;font-size:20px}
-
-    /* responsive */
-    @media (max-width:960px){
-      .cards{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:640px){
-      .cards{grid-template-columns:1fr}
-      header{flex-direction:column;align-items:flex-start}
-      .top-row{width:100%}
-    }
-  </style>
-</head>
-<body>
-  <div class="container" role="application">
-    <header>
-      <div>
-        <h1>Account Dashboard</h1>
-        <p style="margin:6px 0 0 0;color:var(--muted);font-size:13px">Quick actions and balances</p>
-      </div>
-      <div class="top-row">
-        <div class="outstanding" aria-live="polite">
-          <div class="label">Outstanding Balance</div>
-          <div id="outstanding-amount" class="amount">$123.45</div>
-        </div>
-      </div>
-    </header>
-
-    <section class="cards" aria-label="Actions">
-      <div class="card" id="card-1">
-        <div>
-          <h3>To Another Bank</h3>
-          <p>Send funds to an external bank account. Secure and fast transfers.</p>
-        </div>
-        <div class="actions">
-          <button class="btn primary" data-open="transfer-modal">Transfer</button>
-          <button class="btn ghost">View</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div>
-          <h3>Within Bank</h3>
-          <p>Quick transfer to another account within the same bank.</p>
-        </div>
-        <div class="actions">
-          <button class="btn">Transfer</button>
-          <button class="btn ghost">View</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div>
-          <h3>Scheduled Payments</h3>
-          <p>Set up recurring payments or schedule a one-time transfer.</p>
-        </div>
-        <div class="actions">
-          <button class="btn">Setup</button>
-          <button class="btn ghost">View</button>
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- Transfer Modal -->
-  <div class="modal-backdrop" id="transfer-modal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document">
-      <div class="modal-header">
-        <h2>Transfer - To Another Bank</h2>
-        <button class="close" data-close aria-label="Close transfer dialog">✕</button>
-      </div>
-      <form id="transfer-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="amount">Amount</label>
-            <input id="amount" name="amount" type="number" step="0.01" min="0.01" required placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label for="account">Recipient Account</label>
-            <input id="account" name="account" type="text" required placeholder="123456789">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Discover Bank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div id="app">
+      <section id="splash" class="page active">
+        <div class="splash-container">
+          <div class="logo-container">
+            <div class="discover-logo">
+              <span class="logo-text">DISC</span><span class="logo-circle"></span><span class="logo-text">VER</span>
+            </div>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group" style="flex:1">
-            <label for="bank">Bank Name</label>
-            <input id="bank" name="bank" type="text" placeholder="Example Bank">
+      </section>
+
+      <section id="login" class="page">
+        <div class="login-container">
+          <div class="login-header">
+            <div class="discover-logo-small">
+              <span class="logo-text">DISC</span><span class="logo-circle-small"></span><span class="logo-text">VER</span>
+            </div>
+          </div>
+
+          <form id="loginForm" class="login-form">
+            <div class="form-group">
+              <label for="userId">User ID</label>
+              <input type="text" id="userId" value="mike214tom32" autocomplete="username" />
+            </div>
+
+            <div class="form-group checkbox-group">
+              <input type="checkbox" id="remember" checked />
+              <label for="remember">Remember</label>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" />
+            </div>
+
+           
+
+            <button type="submit" class="btn-primary">Log In</button>
+
+            <div class="login-links">
+             
+              <a href="#" class="link">Need help logging in?</a>
+            </div>
+          </form>
+
+          <div class="login-footer">
+            <div class="footer-info">
+              <span>Version 2518.1 | </span>
+              <a href="#" class="link">Privacy & Terms</a>
+            </div>
+            <p class="copyright">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group" style="flex:1">
-            <label for="note">Memo (optional)</label>
-            <textarea id="note" name="note" placeholder="For rent, invoice #123, ..."></textarea>
+      </section>
+
+      <section id="dashboard" class="page">
+        <div class="page-header">
+          <div class="discover-logo-header">
+            <span class="logo-text">DISC</span><span class="logo-circle-small"></span><span class="logo-text">VER</span>
+          </div>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <div class="account-card">
+            <div class="account-info">
+              <h2 id="account-label" class="account-label-animated">CASHBACK DEBIT</h2>
+              <p class="account-number account-number-animated" id="account-number-label">(...8179)</p>
+            </div>
+            <button class="btn-link" data-navigate="balance">View Account Details <i class="fas fa-chevron-right"></i></button>
+          </div>
+
+          <div class="money-tools-card">
+            <div class="money-tools-icons">
+              <div class="tool-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="tool-icon">
+                <i class="fas fa-dollar-sign"></i>
+              </div>
+              <div class="tool-icon">
+                <i class="fas fa-chart-pie"></i>
+              </div>
+              <div class="tool-icon">
+                <i class="fas fa-chart-bar"></i>
+              </div>
+            </div>
+            <h3>Discover Money Tools</h3>
+            <p>Get free daily insights and budget tools to help you bank better.</p>
+            <button class="btn-get-started">Get Started</button>
+          </div>
+
+          <div class="cashback-bonus-card">
+            <div class="cashback-bonus-header">
+              <div class="cashback-icon-text">
+                <i class="fas fa-circle-notch"></i>
+                <h3>Cashback Bonus®</h3>
+              </div>
+              <button class="btn-redeem">Redeem</button>
+            </div>
+            <div class="cashback-balance-info">
+              <p class="cashback-label">Cashback Bonus® Balance</p>
+              <p class="cashback-amount">$0.00</p>
+            </div>
+            <button class="btn-view-activity">View Activity</button>
+          </div>
+
+          <div class="add-money-card">
+            <div class="add-money-icon">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <h3>Add money to your account</h3>
+            <p>Fund now to enjoy the features and benefits of your account.</p>
+            <button class="btn-transfer-funds" data-navigate="deposit">Transfer Funds</button>
+          </div>
+
+          <div class="dashboard-footer">
+            <div class="footer-links-row">
+              <a href="#" class="footer-link">Privacy & Terms</a>
+              <span class="separator">|</span>
+              <a href="#" class="footer-link">Provide Feedback</a>
+            </div>
+            <div class="fdic-section">
+              <div class="fdic-logo">
+                <i class="fas fa-home"></i>
+                <div class="fdic-text-small">
+                  <span>Member</span>
+                  <strong>FDIC</strong>
+                </div>
+              </div>
+            </div>
+            <p class="copyright-small">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn ghost" data-close>Cancel</button>
-          <button type="submit" class="btn primary">Submit Transfer</button>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item active" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="deposit" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h1>Deposit</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
         </div>
-      </form>
+
+        <div class="page-content">
+          <h2 class="page-title">Decide how you want to deposit</h2>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="option-content">
+              <h3>Mobile Check Deposit</h3>
+              <p>Deposit checks by taking a photo with your mobile device</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-university"></i>
+            </div>
+            <div class="option-content">
+              <h3>Direct Deposit</h3>
+              <p>Set up direct deposit from your employer</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-money-bill"></i>
+            </div>
+            <div class="option-content">
+              <h3>Add Cash</h3>
+              <p>Deposit cash at participating retailers</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item active" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="balance" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <div class="discover-logo-header">
+            <span class="logo-text">DISC</span><span class="logo-circle-small"></span><span class="logo-text">VER</span>
+          </div>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content dark-bg">
+          <div class="balance-header-dark">
+            <h2 class="account-name-dark">CASHBACK DEBIT (8179)</h2>
+            <div class="balance-amount-dark">$270,000.00</div>
+            <p class="balance-label-dark">Available Balance</p>
+            <div class="current-balance">
+              <span>Outstanding Balance</span>
+              <span>$574.40 <i class="fas fa-question-circle"></i></span>
+            </div>
+            <button class="btn-outline-white">Open an Online Savings Account</button>
+          </div>
+
+          <div class="promo-card-white">
+            <h3>Guaranteed returns with a CD</h3>
+            <p>A high-yield CD can help you save with returns you can count on.</p>
+            <button class="btn-outline-primary">Open a CD</button>
+          </div>
+
+          <div class="activity-section">
+            <div class="activity-tabs">
+              <button class="tab active">Activity</button>
+              <button class="tab">Scheduled</button>
+            </div>
+
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-info">
+                  <h4>Bank Charges</h4>
+                  <p>July 10, 2025</p>
+                </div>
+                <div class="activity-amount positive">+$300.00</div>
+              </div>
+
+              <div class="activity-item">
+                <div class="activity-info">
+                  <h4>Check Deposit</h4>
+                  <p>July 8, 2025</p>
+                </div>
+                <div class="activity-amount positive">$270,000.00</div>
+              </div>
+
+            <!-- <button class="btn-link-center view-more">View More</button> -->
+            </div>
+          </div>
+
+          <div class="info-links">
+            <a href="#" class="info-link-white">
+              <i class="fas fa-shield-alt"></i>
+              <span>Online Privacy Protection</span>
+              <i class="fas fa-chevron-right"></i>
+            </a>
+            <a href="#" class="info-link-white">
+              <i class="fab fa-cc-discover"></i>
+              <span>Send Money with Zelle</span>
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item active" data-navigate="balance">
+            <i class="fas fa-bars"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-envelope"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="pay" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h1>Welcome to Bill Pay</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content billpay-content">
+          <div class="billpay-illustration">
+            <div class="bill-graphic">
+              <div class="bill-line long"></div>
+              <div class="bill-line short"></div>
+              <div class="bill-item">
+                <div class="bill-text"></div>
+                <span class="bill-dollar">$</span>
+              </div>
+              <div class="bill-item">
+                <div class="bill-text short"></div>
+                <span class="bill-dollar">$</span>
+              </div>
+              <div class="bill-item">
+                <div class="bill-text"></div>
+                <span class="bill-dollar">$</span>
+              </div>
+              <div class="bill-item">
+                <div class="bill-text"></div>
+                <span class="bill-dollar">$</span>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="billpay-title">Bill Pay is better than ever</h2>
+          <p class="billpay-description">Take care of business from anywhere, at any time, with Bill Pay's streamlined experience.</p>
+          <p class="billpay-cta">Swipe to get the details.</p>
+
+          <div class="carousel-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+
+          <div class="page-footer-centered">
+            <div class="footer-links">
+              <a href="#" class="link">Privacy & Terms</a>
+              <span> | </span>
+              <a href="#" class="link">Provide Feedback</a>
+            </div>
+            <div class="fdic-logos">
+              <i class="fas fa-home"></i>
+              <span class="fdic-text">Member<br><strong>FDIC</strong></span>
+            </div>
+            <p class="copyright">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item active" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="profile" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="more">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h1>Profile</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <div class="profile-section">
+            <div class="profile-label">
+              <span>Name</span>
+              <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="profile-value">LEANNA JO LUNDBERG</div>
+          </div>
+
+          <div class="profile-section">
+            <div class="profile-label">Home Number</div>
+            <div class="profile-value">763-620-6379</div>
+          </div>
+
+          <div class="profile-section">
+            <div class="profile-label">Email</div>
+            <div class="profile-value">leandav2014@gmail.com</div>
+          </div>
+
+          <div class="profile-section">
+            <div class="profile-label">Home Address</div>
+            <div class="profile-value">5324 60TH AVE<br>PRINCETON, MN 55371-6420</div>
+          </div>
+
+          <button class="btn-primary full-width">Edit</button>
+
+          <div class="page-footer-centered">
+            <div class="footer-links">
+              <a href="#" class="link">Privacy & Terms</a>
+              <span> | </span>
+              <a href="#" class="link">Provide Feedback</a>
+            </div>
+            <div class="fdic-logos">
+              <i class="fas fa-home"></i>
+              <span class="fdic-text">Member<br><strong>FDIC</strong></span>
+            </div>
+            <p class="copyright">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="more" class="page">
+        <div class="page-header">
+          <i class="fas fa-bell header-icon"></i>
+          <h1>More</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <div class="settings-card">
+            <div class="settings-item" data-navigate="profile">
+              <span>Face ID</span>
+              <div class="settings-right">
+                <span class="status-on">ON</span>
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+            <div class="settings-item-divider"></div>
+            <div class="settings-item">
+              <span>Manage Third-Party Access</span>
+              <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-header">
+              <i class="fas fa-cog"></i>
+              <h3>Mobile Settings</h3>
+            </div>
+
+            <div class="settings-toggle-item">
+              <div>
+                <h4>Quick View</h4>
+                <p>See account balance(s) from your login screen.</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-toggle-item">
+              <div>
+                <h4>Widget</h4>
+                <p>See your account details from your Notification Center or Home Screen.</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="promo-card-accent">
+            <div class="promo-icon">
+              <i class="fas fa-university"></i>
+            </div>
+            <h3>Open An Account</h3>
+            <p>Credit Cards, Cashback Debit, Online Savings Account, Personal Loans, Money Market, and more.</p>
+            <button class="btn-outline-primary">View Accounts</button>
+          </div>
+
+          <div class="page-footer-centered">
+            <div class="footer-links">
+              <a href="#" class="link">Privacy & Terms</a>
+              <span> | </span>
+              <a href="#" class="link">Provide Feedback</a>
+            </div>
+            <div class="fdic-logos">
+              <i class="fas fa-home"></i>
+              <span class="fdic-text">Member<br><strong>FDIC</strong></span>
+            </div>
+            <p class="copyright">&copy;2025 Discover, a division of Capital One, N.A., Member FDIC</p>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
+
+      <section id="transfer" class="page">
+        <div class="page-header">
+          <button class="btn-back" data-navigate="dashboard">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h1>Transfer</h1>
+          <button class="btn-logout" data-action="logout">Log Out</button>
+        </div>
+
+        <div class="page-content">
+          <h2 class="page-title">Choose your transfer type</h2>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-exchange-alt"></i>
+            </div>
+            <div class="option-content">
+              <h3>Between My Accounts</h3>
+              <p>Transfer money between your Discover accounts</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-university"></i>
+            </div>
+            <div class="option-content">
+              <h3>To Another Bank</h3>
+              <p>Transfer to an external account</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+
+          <div class="deposit-option-card">
+            <div class="option-icon">
+              <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="option-content">
+              <h3>To Someone Else</h3>
+              <p>Send money to friends and family</p>
+            </div>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="background-color: #001E3C;">
+          <button class="nav-item" data-navigate="dashboard">
+            <i class="fas fa-list"></i>
+            <span>Activity</span>
+          </button>
+          <button class="nav-item active" data-navigate="transfer">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transfer</span>
+          </button>
+          <button class="nav-item" data-navigate="deposit">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Deposit</span>
+          </button>
+          <button class="nav-item" data-navigate="pay">
+            <i class="fas fa-wallet"></i>
+            <span>Pay</span>
+          </button>
+          <button class="nav-item" data-navigate="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+          </button>
+        </nav>
+      </section>
     </div>
-  </div>
 
-  <!-- Processing Overlay -->
-  <div class="overlay" id="processing-overlay" aria-hidden="true" aria-live="polite">
-    <div class="card">
-      <div class="spinner" aria-hidden="true"></div>
-      <div id="processing-message">Processing...</div>
-      <div class="progress-bar" aria-hidden="true">
-        <i id="processing-progress" style="width:0%"></i>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notification Modal (Pay outstanding balance) -->
-  <div class="modal-backdrop" id="notify-modal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document">
-      <div class="modal-header">
-        <h2>Notice</h2>
-        <button class="close" data-close aria-label="Close notice">✕</button>
-      </div>
-      <div class="notify-content">
-        <p>Please pay your outstanding balance to keep your account in good standing.</p>
-        <div>
-          <div class="label" style="color:var(--muted);font-size:13px">Outstanding Balance</div>
-          <div id="notify-amount" class="notify-amount">$123.45</div>
-        </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-          <button class="btn ghost" data-close>Later</button>
-          <button id="pay-now" class="btn primary">Pay Now</button>
-        </div>
-        <div id="payment-result" style="margin-top:6px;color:var(--muted);font-size:13px"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    (function(){
-      // Elements
-      const openBtns = document.querySelectorAll('[data-open]');
-      const closeBtns = document.querySelectorAll('[data-close]');
-      const transferModal = document.getElementById('transfer-modal');
-      const notifyModal = document.getElementById('notify-modal');
-      const processingOverlay = document.getElementById('processing-overlay');
-      const transferForm = document.getElementById('transfer-form');
-      const processingMessage = document.getElementById('processing-message');
-      const processingProgress = document.getElementById('processing-progress');
-      const outstandingAmountEl = document.getElementById('outstanding-amount');
-      const notifyAmountEl = document.getElementById('notify-amount');
-      const payNowBtn = document.getElementById('pay-now');
-      const paymentResult = document.getElementById('payment-result');
-
-      // Utility functions
-      function showModal(modal){
-        modal.style.display = 'flex';
-        modal.setAttribute('aria-hidden','false');
-        // focus first input/button inside
-        setTimeout(()=>{
-          const focusable = modal.querySelector('button, input, textarea, select');
-          if(focusable) focusable.focus();
-        },50);
-        trapFocus(modal);
-      }
-      function hideModal(modal){
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden','true');
-        releaseFocus(modal);
-      }
-      function showProcessing(message){
-        processingMessage.textContent = message || 'Processing...';
-        processingOverlay.style.display = 'flex';
-        processingOverlay.setAttribute('aria-hidden','false');
-        startProgress();
-      }
-      function hideProcessing(){
-        stopProgress();
-        processingOverlay.style.display = 'none';
-        processingOverlay.setAttribute('aria-hidden','true');
-      }
-
-      // Simple focus trap for modal
-      const focusTraps = new Map();
-      function trapFocus(modal){
-        const focusable = Array.from(modal.querySelectorAll('a[href], button:not([disabled]), textarea, input, select'));
-        if(!focusable.length) return;
-        function keyHandler(e){
-          if(e.key === 'Tab'){
-            const idx = focusable.indexOf(document.activeElement);
-            if(e.shiftKey){
-              if(idx === 0){
-                focusable[focusable.length-1].focus();
-                e.preventDefault();
-              }
-            } else {
-              if(idx === focusable.length-1){
-                focusable[0].focus();
-                e.preventDefault();
-              }
-            }
-          } else if(e.key === 'Escape'){
-            // close modal via close buttons
-            const c = modal.querySelector('[data-close]');
-            if(c) c.click();
-          }
-        }
-        modal.addEventListener('keydown', keyHandler);
-        focusTraps.set(modal, keyHandler);
-      }
-      function releaseFocus(modal){
-        const handler = focusTraps.get(modal);
-        if(handler) modal.removeEventListener('keydown', handler);
-        focusTraps.delete(modal);
-      }
-
-      // Progress simulation
-      let progressInterval = null;
-      function startProgress(){
-        let pct = 8;
-        processingProgress.style.width = pct + '%';
-        if(progressInterval) clearInterval(progressInterval);
-        progressInterval = setInterval(()=>{
-          pct += Math.random()*18; // random increase
-          if(pct >= 98){
-            pct = 98; // wait for completion to set 100
-            processingProgress.style.width = pct + '%';
-            clearInterval(progressInterval);
-            progressInterval = null;
-          } else {
-            processingProgress.style.width = Math.round(pct) + '%';
-          }
-        }, 350);
-      }
-      function stopProgress(){
-        if(progressInterval) {clearInterval(progressInterval); progressInterval=null}
-        processingProgress.style.width = '100%';
-        // small pause for visual completion
-        setTimeout(()=>{processingProgress.style.width='0%';}, 300);
-      }
-
-      // Attach open event
-      openBtns.forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const target = btn.getAttribute('data-open');
-          const modal = document.getElementById(target);
-          if(modal) showModal(modal);
-        });
-      });
-
-      // Attach close event
-      closeBtns.forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const modal = btn.closest('.modal-backdrop');
-          if(modal) hideModal(modal);
-        });
-      });
-
-      // Transfer submit flow
-      transferForm.addEventListener('submit', function(e){
-        e.preventDefault();
-        // Basic validation
-        const amount = parseFloat(transferForm.amount.value || 0);
-        if(!amount || amount <= 0){
-          alert('Please enter a valid amount');
-          transferForm.amount.focus();
-          return;
-        }
-        // Hide transfer modal
-        hideModal(transferModal);
-
-        // Show processing overlay for transfer
-        showProcessing('Processing transfer...');
-
-        // Simulate async transfer (2s)
-        setTimeout(()=>{
-          // finish processing
-          stopProgress();
-          // small delay then hide overlay and show notification modal
-          setTimeout(()=>{
-            hideProcessing();
-            // update notify modal amount to current outstanding
-            notifyAmountEl.textContent = outstandingAmountEl.textContent;
-            paymentResult.textContent = '';
-            showModal(notifyModal);
-          }, 350);
-        }, 2300);
-      });
-
-      // Pay Now flow - simulates making payment then clears outstanding
-      payNowBtn.addEventListener('click', function(){
-        paymentResult.textContent = '';
-        hideModal(notifyModal);
-        showProcessing('Processing payment...');
-        // Simulate payment processing
-        setTimeout(()=>{
-          // Complete
-          stopProgress();
-          setTimeout(()=>{
-            hideProcessing();
-            // Update outstanding amount to $0.00
-            outstandingAmountEl.textContent = '$0.00';
-            notifyAmountEl.textContent = '$0.00';
-            // Show notification success again to confirm
-            showModal(notifyModal);
-            paymentResult.textContent = 'Payment complete. Your outstanding balance is now $0.00.';
-            paymentResult.style.color = 'var(--success)';
-          }, 300);
-        }, 1800);
-      });
-
-      // Close notify modal - when user clicks Later or Close
-      // Ensure outstanding amount displays updated value if changed
-      const notifyCloseBtns = notifyModal.querySelectorAll('[data-close]');
-      notifyCloseBtns.forEach(b=>b.addEventListener('click', ()=>{
-        // refresh outstanding display
-        notifyAmountEl.textContent = outstandingAmountEl.textContent;
-        hideModal(notifyModal);
-      }));
-
-      // Close overlay on click outside card if visible (optional)
-      processingOverlay.addEventListener('click', (e)=>{
-        if(e.target === processingOverlay){
-          // don't allow closing while processing
-        }
-      });
-
-      // Initialize: hide everything
-      hideModal(transferModal);
-      hideModal(notifyModal);
-      hideProcessing();
-
-      // Accessibility: ensure focus visible for keyboard users
-      document.addEventListener('keydown', (e)=>{
-        if(e.key === 'Escape'){
-          // Close any open modal
-          [transferModal, notifyModal].forEach(m=>{ if(m.style.display==='flex') hideModal(m)});
-        }
-      });
-
-    })();
-  </script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="script.js"></script>
+    <script src="advanced.js"></script>
+  </body>
 </html>
