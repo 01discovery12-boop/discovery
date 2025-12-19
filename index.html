@@ -11,6 +11,112 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Inline styles for the withdraw form, processing overlay and modal -->
+    <style>
+      /* Withdraw card */
+      .withdraw-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px;
+        margin: 16px 0;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      }
+      .withdraw-card h3 {
+        margin: 0 0 8px 0;
+      }
+      .withdraw-row {
+        display:flex;
+        gap:8px;
+        align-items:center;
+        margin-bottom:8px;
+      }
+      .withdraw-row input[type="number"],
+      .withdraw-row select {
+        flex:1;
+        padding:8px;
+        border-radius:6px;
+        border:1px solid #ddd;
+      }
+      .btn-pay-outstanding {
+        margin-top: 8px;
+        display:inline-block;
+      }
+
+      /* Processing overlay */
+      #processingOverlay {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.4);
+        z-index: 1200;
+      }
+      .processing-card {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        display:flex;
+        gap:16px;
+        align-items:center;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+      }
+      .spinner {
+        width:40px;
+        height:40px;
+        border-radius:50%;
+        border:4px solid #e6e6e6;
+        border-top-color:#001E3C;
+        animation:spin 1s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* Modal notification */
+      #notificationModal {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        z-index: 1300;
+        display:none;
+        width: 90%;
+        max-width: 420px;
+        text-align: center;
+      }
+      #notificationModal h4 {
+        margin-top:0;
+      }
+      #notificationModal .modal-actions {
+        margin-top: 12px;
+        display:flex;
+        justify-content:center;
+        gap:8px;
+      }
+      .modal-btn {
+        padding:8px 14px;
+        border-radius:8px;
+        border: none;
+        cursor:pointer;
+      }
+      .modal-btn.primary {
+        background:#001E3C;
+        color:#fff;
+      }
+      .modal-btn.ghost {
+        background:transparent;
+        border:1px solid #ccc;
+      }
+
+      /* Small responsive tweaks */
+      @media (min-width: 720px) {
+        .withdraw-row { gap:12px; }
+      }
+    </style>
   </head>
   <body>
     <div id="app">
@@ -48,12 +154,11 @@
               <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" />
             </div>
 
-           
 
             <button type="submit" class="btn-primary">Log In</button>
 
             <div class="login-links">
-             
+
               <a href="#" class="link">Need help logging in?</a>
             </div>
           </form>
@@ -260,9 +365,30 @@
             <p class="balance-label-dark">Available Balance</p>
             <div class="current-balance">
               <span>Outstanding Balance</span>
-              <span>$574.40 <i class="fas fa-question-circle"></i></span>
+              <span id="outstandingAmount">$574.40 <i class="fas fa-question-circle"></i></span>
             </div>
+
+            <!-- Pay Outstanding button (shows processing animation and notification) -->
+            <button id="payOutstandingBtn" class="btn-primary btn-pay-outstanding">Pay Outstanding</button>
+
             <button class="btn-outline-white">Open an Online Savings Account</button>
+          </div>
+
+          <!-- Withdraw form -->
+          <div class="withdraw-card" aria-labelledby="withdrawTitle">
+            <h3 id="withdrawTitle">Withdraw Funds</h3>
+            <form id="withdrawForm">
+              <div class="withdraw-row">
+                <input type="number" id="withdrawAmount" name="amount" min="1" step="0.01" placeholder="Amount ($)" required />
+                <select id="withdrawDestination" name="destination" required>
+                  <option value="cash">Cash</option>
+                  <option value="external">External Bank</option>
+                  <option value="atm">ATM</option>
+                </select>
+                <button type="submit" class="btn-primary">Withdraw</button>
+              </div>
+              <p style="margin:0;color:#666;font-size:13px;">Withdrawals may take a few moments to process.</p>
+            </form>
           </div>
 
           <div class="promo-card-white">
@@ -661,19 +787,135 @@
       </section>
     </div>
 
+    <!-- Processing overlay (hidden by default) -->
+    <div id="processingOverlay" role="status" aria-hidden="true">
+      <div class="processing-card" role="dialog" aria-modal="true">
+        <div class="spinner" aria-hidden="true"></div>
+        <div>
+          <strong>Processing</strong>
+          <div style="color:#666;font-size:13px;">Please wait while we process your request...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification modal -->
+    <div id="notificationModal" role="alertdialog" aria-hidden="true" aria-labelledby="modalTitle">
+      <h4 id="modalTitle">Pay your outstanding balance</h4>
+      <p id="modalBody" style="color:#444;">Please pay your outstanding balance to avoid late fees.</p>
+      <div class="modal-actions">
+        <button id="modalClose" class="modal-btn ghost">Close</button>
+        <button id="modalPayNow" class="modal-btn primary">Pay Now</button>
+      </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="script.js"></script>
     <script src="advanced.js"></script>
+
+    <!-- Inline script to wire up the withdraw form and pay behavior -->
+    <script>
+      (function () {
+        const processingOverlay = document.getElementById('processingOverlay');
+        const notificationModal = document.getElementById('notificationModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalPayNow = document.getElementById('modalPayNow');
+        const payOutstandingBtn = document.getElementById('payOutstandingBtn');
+        const withdrawForm = document.getElementById('withdrawForm');
+
+        // Utility helpers
+        function showProcessing() {
+          processingOverlay.style.display = 'flex';
+          processingOverlay.setAttribute('aria-hidden', 'false');
+        }
+        function hideProcessing() {
+          processingOverlay.style.display = 'none';
+          processingOverlay.setAttribute('aria-hidden', 'true');
+        }
+        function showModal(message) {
+          const body = document.getElementById('modalBody');
+          if (message) body.textContent = message;
+          notificationModal.style.display = 'block';
+          notificationModal.setAttribute('aria-hidden', 'false');
+        }
+        function hideModal() {
+          notificationModal.style.display = 'none';
+          notificationModal.setAttribute('aria-hidden', 'true');
+        }
+
+        // Pay Outstanding behavior:
+        // Show processing animation, then show modal with the message "Pay your outstanding balance"
+        payOutstandingBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          // If outstanding amount is $0, show a different message
+          const outstandingEl = document.getElementById('outstandingAmount');
+          const outstandingText = outstandingEl ? outstandingEl.textContent.trim() : '';
+          showProcessing();
+
+          // Simulate processing delay (e.g., send request to API here)
+          setTimeout(() => {
+            hideProcessing();
+            showModal('Pay your outstanding balance');
+          }, 1400);
+        });
+
+        // Modal controls
+        modalClose.addEventListener('click', function (e) {
+          hideModal();
+        });
+        modalPayNow.addEventListener('click', function (e) {
+          hideModal();
+          // For now simulate processing when user clicks Pay Now
+          showProcessing();
+          setTimeout(() => {
+            hideProcessing();
+            // Update outstanding amount UI to zero (simulate payment)
+            const outstandingEl = document.getElementById('outstandingAmount');
+            if (outstandingEl) outstandingEl.textContent = '$0.00';
+            // Show a brief confirmation modal
+            showModal('Payment successful. Your outstanding balance is now $0.00.');
+            setTimeout(() => {
+              // Auto-close confirmation after short delay
+              hideModal();
+            }, 1600);
+          }, 1000);
+        });
+
+        // Withdraw form submission: show processing, then a confirmation modal
+        withdrawForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const amountInput = document.getElementById('withdrawAmount');
+          const dest = document.getElementById('withdrawDestination').value;
+          const amount = amountInput && amountInput.value ? parseFloat(amountInput.value) : 0;
+          if (!amount || amount <= 0) {
+            showModal('Please enter a valid withdrawal amount.');
+            return;
+          }
+
+          showProcessing();
+          setTimeout(() => {
+            hideProcessing();
+            showModal('Withdrawal submitted for $' + amount.toFixed(2) + ' to ' + dest + '. It may take a few minutes to complete.');
+            // Optionally clear the form
+            withdrawForm.reset();
+          }, 1200);
+        });
+
+        // Close modal when clicking outside it
+        window.addEventListener('click', function (e) {
+          if (e.target === notificationModal) {
+            hideModal();
+          }
+        });
+
+        // Accessibility: close modal on Escape
+        window.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') {
+            hideModal();
+            hideProcessing();
+          }
+        });
+
+      })();
+    </script>
   </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
