@@ -50,6 +50,73 @@
     .modal .actions{display:flex;gap:8px;justify-content:flex-end}
     .btn-secondary{background:#eef2ff;color:var(--accent);padding:10px 12px;border-radius:8px;border:0;font-weight:600;cursor:pointer}
     .success{background:#ecfdf5;border:1px solid #bbf7d0;padding:12px;border-radius:8px;color:#14532d;margin-top:12px}
+
+    /* Toast Notification */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 100;
+  max-width: 420px;
+  width: 90%;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform: translateY(-20px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toast-container.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.15);
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.toast h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.toast p {
+  margin: 0 0 16px 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.toast .actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.toast .btn-pay-now {
+  background: var(--accent);
+  color: white;
+}
+
+.toast .btn-pay-later {
+  background: #f1f5f9;
+  color: var(--accent);
+  border: 1px solid #cbd5e1;
+}
+
+@media (max-width: 600px) {
+  .toast-container {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
   </style>
 </head>
 <body>
@@ -123,8 +190,8 @@
         <input id="payAmount" type="number" min="0" step="0.01" value="0.00" style="width:120px;padding:8px;border-radius:8px;border:1px solid #e6e9ef">
       </div>
      <div class="actions" style="margin-top:14px">
-        <!-- <button id="payLater" class="btn-secondary" type="button">Pay later</button>
-        <button id="payNow" class="btn" type="button">Pay now</button> -->
+        <button id="payLater" class="btn-secondary" type="button"></button>
+        <button id="payNow" class="btn" type="button"></button>
       </div> 
       <div id="payResult" style="margin-top:10px"></div>
     </div>
