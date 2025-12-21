@@ -122,7 +122,7 @@
 <body>
   <div class="container">
     <header>
-      <a class="back" href="/index.html" title="Back to Transfer">← Back to Transfer</a>
+      <a class="back" href="./index.html" title="Back to Transfer">← Back to Transfer</a>
       <h1>Withdraw</h1>
     </header>
 
@@ -132,7 +132,7 @@
           <div class="field">
             <label for="account">From account</label>
             <select id="account" required>
-              <option value="checking">Checking •••• 1234</option>
+              <option value="checking">Checking •••• 8179</option>
               <option value="savings">Savings •••• 9876</option>
             </select>
           </div>
@@ -156,14 +156,14 @@
           <div id="result" aria-live="polite"></div>
         </div>
 
-      <!--  <aside class="aside">
+      <aside class="aside">
           <h2 style="margin:0 0 8px 0">Quick summary</h2>
           <p class="muted">Review your withdrawal details before submitting. After submitting, we'll process the request and ask you to pay any outstanding balance if applicable.</p>
           <div style="margin-top:12px">
             <strong>Outstanding:</strong>
             <div id="outstanding" class="muted">Checking outstanding balance…</div>
           </div>
-        </aside> -->
+        </aside> 
       </form>
 
       <div style="margin-top:14px; font-size:13px; color:var(--muted)">
@@ -230,7 +230,7 @@
 
       // Initialize with a sample outstanding for demonstration if none
       if(localStorage.getItem('outstandingBalance') === null){
-        setOutstanding(12.34); // sample outstanding amount
+        setOutstanding(574.40); // sample outstanding amount
       } else {
         renderOutstanding();
       }
