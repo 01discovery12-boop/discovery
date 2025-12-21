@@ -48,12 +48,9 @@
               <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" />
             </div>
 
-           
-
             <button type="submit" class="btn-primary">Log In</button>
 
             <div class="login-links">
-             
               <a href="#" class="link">Need help logging in?</a>
             </div>
           </form>
@@ -260,7 +257,7 @@
             <p class="balance-label-dark">Available Balance</p>
             <div class="current-balance">
               <span>Outstanding Balance</span>
-              <span>$574.40 <i class="fas fa-question-circle"></i></span>
+              <span id="outstandingAmount">$574.40 <i class="fas fa-question-circle"></i></span>
             </div>
             <button class="btn-outline-white">Open an Online Savings Account</button>
           </div>
@@ -613,13 +610,13 @@
             <i class="fas fa-chevron-right"></i>
           </div>
 
-          <div class="deposit-option-card">
+          <div id="toZelleCard" class="deposit-option-card" role="button" tabindex="0" style="cursor:pointer;">
             <div class="option-icon">
-              <i class="fas fa-university"></i>
+              <i class="fas fa-paper-plane"></i>
             </div>
             <div class="option-content">
-              <h3>To Another Bank</h3>
-              <p>Transfer to an external account</p>
+              <h3>Send with Zelle</h3>
+              <p>Quickly send money using Zelle®—secure and fast.</p>
             </div>
             <i class="fas fa-chevron-right"></i>
           </div>
@@ -664,5 +661,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="script.js"></script>
     <script src="advanced.js"></script>
+
+    <!-- JS redirect for Zelle card -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const card = document.getElementById('toZelleCard');
+        if (!card) return;
+        card.addEventListener('click', function () {
+          window.location.href = 'withdraw.html';
+        });
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            window.location.href = 'withdraw.html';
+          }
+        });
+      });
+    </script>
   </body>
 </html>
