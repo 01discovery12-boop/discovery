@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Withdraw - Discovery</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#fff;--accent:#2563eb;--danger:#dc2626;--muted:#6b7280}
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:var(--bg); color:#0f172a}
+    .container{max-width:980px;margin:36px auto;padding:20px}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+    a.back{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--accent);font-weight:600}
+    .card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    h1{margin:0 0 12px 0;font-size:20px}
+
+    form{display:grid;grid-template-columns:1fr 300px;gap:16px}
+    .form-left{display:flex;flex-direction:column;gap:12px}
+    .field{display:flex;flex-direction:column}
+    label{font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type="text"],input[type="number"],select{padding:12px;border:1px solid #e6e9ef;border-radius:8px;font-size:15px}
+    .note{font-size:13px;color:var(--muted)}
+    .btn{background:var(--accent);color:#fff;padding:12px 14px;border-radius:10px;border:0;font-weight:600;cursor:pointer}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .aside{background:#fbfdff;border:1px solid #eef2ff;padding:16px;border-radius:10px}
+    .muted{color:var(--muted)}
+
+    /* Responsive */
+    @media (max-width:800px){
+      form{grid-template-columns:1fr}
+      .aside{order:2}
+    }
+
+    /* Processing overlay */
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,0.5);display:flex;align-items:center;justify-content:center;z-index:40;backdrop-filter:blur(2px);visibility:hidden;opacity:0;transition:opacity .18s,visibility .18s}
+    .overlay.show{visibility:visible;opacity:1}
+    .spinner{width:88px;height:88px;border-radius:14px;background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:600}
+    .lds-ring{display:inline-block;position:relative;width:48px;height:48px}
+    .lds-ring div{box-sizing:border-box;display:block;position:absolute;width:40px;height:40px;margin:4px;border:4px solid #fff;border-radius:50%;animation:lds-ring 1.2s cubic-bezier(.5,.2,.5,.9) infinite;border-color:#fff transparent transparent transparent}
+    .lds-ring div:nth-child(1){animation-delay:-.45s}
+    .lds-ring div:nth-child(2){animation-delay:-.3s}
+    .lds-ring div:nth-child(3){animation-delay:-.15s}
+    @keyframes lds-ring{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:flex;align-items:center;justify-content:center;z-index:50;visibility:hidden;opacity:0;transition:opacity .15s,visibility .15s}
+    .modal-backdrop.show{visibility:visible;opacity:1}
+    .modal{background:var(--card);padding:18px;border-radius:12px;max-width:420px;width:92%;box-shadow:0 10px 30px rgba(2,6,23,0.12)}
+    .modal h2{margin:0 0 8px 0}
+    .modal p{margin:0 0 16px 0;color:var(--muted)}
+    .modal .actions{display:flex;gap:8px;justify-content:flex-end}
+    .btn-secondary{background:#eef2ff;color:var(--accent);padding:10px 12px;border-radius:8px;border:0;font-weight:600;cursor:pointer}
+    .success{background:#ecfdf5;border:1px solid #bbf7d0;padding:12px;border-radius:8px;color:#14532d;margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a class="back" href="/transfer.html" title="Back to Transfer">← Back to Transfer</a>
+      <h1>Withdraw</h1>
+    </header>
+
+    <main class="card">
+      <form id="withdrawForm" novalidate>
+        <div class="form-left">
+          <div class="field">
+            <label for="account">From account</label>
+            <select id="account" required>
+              <option value="checking">Checking •••• 1234</option>
+              <option value="savings">Savings •••• 9876</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="amount">Amount to withdraw</label>
+            <input id="amount" type="number" min="1" step="0.01" placeholder="0.00" required>
+            <div class="note">Enter the amount you'd like to withdraw. Minimum $1.00.</div>
+          </div>
+
+          <div class="field">
+            <label for="destination">Destination</label>
+            <input id="destination" type="text" placeholder="Bank account or external id (optional)">
+            <div class="note">Optional destination reference for your records.</div>
+          </div>
+
+          <div>
+            <button class="btn" type="submit" id="submitBtn">Withdraw</button>
+          </div>
+
+          <div id="result" aria-live="polite"></div>
+        </div>
+
+        <aside class="aside">
+          <h2 style="margin:0 0 8px 0">Quick summary</h2>
+          <p class="muted">Review your withdrawal details before submitting. After submitting, we'll process the request and ask you to pay any outstanding balance if applicable.</p>
+          <div style="margin-top:12px">
+            <strong>Outstanding:</strong>
+            <div id="outstanding" class="muted">Checking outstanding balance…</div>
+          </div>
+        </aside>
+      </form>
+
+      <div style="margin-top:14px; font-size:13px; color:var(--muted)">
+        Tip: You can go back to the <a href="/transfer.html">Transfer</a> page any time.
+      </div>
+    </main>
+  </div>
+
+  <!-- Processing overlay -->
+  <div id="overlay" class="overlay" role="status" aria-hidden="true">
+    <div class="spinner" aria-hidden="true">
+      <div class="lds-ring" aria-hidden="true"><div></div><div></div><div></div><div></div></div>
+      <div style="margin-top:10px">Processing…</div>
+    </div>
+  </div>
+
+  <!-- Notification modal: Pay your outstanding balance -->
+  <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal" role="document">
+      <h2 id="modalTitle">Pay your outstanding balance</h2>
+      <p>It looks like you have an outstanding balance. Please pay it to complete the withdrawal and avoid delays.</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <label for="payAmount" style="flex:1">Amount to pay</label>
+        <input id="payAmount" type="number" min="0" step="0.01" value="0.00" style="width:120px;padding:8px;border-radius:8px;border:1px solid #e6e9ef">
+      </div>
+      <div class="actions" style="margin-top:14px">
+        <button id="payLater" class="btn-secondary" type="button">Pay later</button>
+        <button id="payNow" class="btn" type="button">Pay now</button>
+      </div>
+      <div id="payResult" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.getElementById('withdrawForm');
+      const amountInput = document.getElementById('amount');
+      const outstandingEl = document.getElementById('outstanding');
+      const overlay = document.getElementById('overlay');
+      const modal = document.getElementById('modal');
+      const payNow = document.getElementById('payNow');
+      const payLater = document.getElementById('payLater');
+      const payAmountInput = document.getElementById('payAmount');
+      const payResult = document.getElementById('payResult');
+      const result = document.getElementById('result');
+
+      // Example: read outstanding from localStorage or use default
+      function getOutstanding(){
+        const raw = localStorage.getItem('outstandingBalance');
+        if(!raw) return 0.00;
+        const num = parseFloat(raw);
+        return isNaN(num) ? 0.00 : num;
+      }
+
+      function setOutstanding(v){
+        localStorage.setItem('outstandingBalance', Number(v).toFixed(2));
+        renderOutstanding();
+      }
+
+      function renderOutstanding(){
+        const v = getOutstanding();
+        outstandingEl.textContent = '$' + Number(v).toFixed(2);
+      }
+
+      // Initialize with a sample outstanding for demonstration if none
+      if(localStorage.getItem('outstandingBalance') === null){
+        setOutstanding(12.34); // sample outstanding amount
+      } else {
+        renderOutstanding();
+      }
+
+      function showOverlay(show){
+        overlay.classList.toggle('show', !!show);
+        overlay.setAttribute('aria-hidden', !show);
+      }
+
+      function showModal(show){
+        modal.classList.toggle('show', !!show);
+        modal.setAttribute('aria-hidden', !show);
+      }
+
+      // Form submit -> show processing -> show modal if outstanding > 0
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const amt = parseFloat(amountInput.value);
+        if(isNaN(amt) || amt < 1){
+          result.innerHTML = '<div class="success" style="background:#fff3cd;border:1px solid #ffe8a1;color:#92400e">Please enter an amount of at least $1.00</div>';
+          return;
+        }
+
+        result.textContent = '';
+        showOverlay(true);
+
+        // Simulate server processing delay
+        setTimeout(function(){
+          // if outstanding exists, prompt to pay
+          const outstanding = getOutstanding();
+          if(outstanding > 0){
+            // prefill pay amount with outstanding (can't exceed withdrawal amount)
+            payAmountInput.value = Math.min(outstanding, amt).toFixed(2);
+            showModal(true);
+            showOverlay(false);
+            // Focus payNow for keyboard users
+            payNow.focus();
+          } else {
+            // no outstanding — complete withdrawal
+            completeWithdrawal(amt);
+          }
+        }, 1300);
+      });
+
+      function completeWithdrawal(amount){
+        // simulate finalize
+        showOverlay(true);
+        setTimeout(function(){
+          showOverlay(false);
+          result.innerHTML = '<div class="success">Withdrawal of $' + Number(amount).toFixed(2) + ' completed successfully.</div>';
+        }, 900);
+      }
+
+      // Pay now handler -> simulate payment -> update localStorage
+      payNow.addEventListener('click', function(){
+        const payAmt = parseFloat(payAmountInput.value);
+        if(isNaN(payAmt) || payAmt <= 0){
+          payResult.innerHTML = '<div class="success" style="background:#fff3cd;border:1px solid #ffe8a1;color:#92400e">Please enter a valid payment amount.</div>';
+          return;
+        }
+
+        // start overlay and simulate payment processing
+        showModal(false);
+        showOverlay(true);
+        payResult.textContent = '';
+
+        setTimeout(function(){
+          // reduce outstanding and write to localStorage
+          const outstanding = getOutstanding();
+          const remaining = Math.max(0, outstanding - payAmt);
+          setOutstanding(remaining);
+
+          // mark paid flag and timestamp
+          localStorage.setItem('outstandingPaid', 'true');
+          localStorage.setItem('outstandingPaidAt', new Date().toISOString());
+          localStorage.setItem('outstandingLastPaidAmount', Number(payAmt).toFixed(2));
+
+          showOverlay(false);
+          result.innerHTML = '<div class="success">Payment of $' + Number(payAmt).toFixed(2) + ' received. Withdrawal will continue.</div>';
+
+          // optional: auto-complete withdrawal if needed — here we just show success and let user continue
+        }, 1200);
+      });
+
+      // Pay later handler
+      payLater.addEventListener('click', function(){
+        showModal(false);
+        result.innerHTML = '<div class="success" style="background:#fff7ed;border:1px solid #ffe2b8;color:#663c00">You chose to pay later. Please note withdrawals may be delayed if outstanding remains.</div>';
+      });
+
+      // Accessibility: close modal on Escape
+      window.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){
+          if(modal.classList.contains('show')) showModal(false);
+        }
+      });
+
+      // Expose a small API for other pages if needed
+      window.withdrawalPage = {
+        getOutstanding,
+        setOutstanding
+      };
+
+    })();
+  </script>
+</body>
+</html>
