@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 duration: 0.5,
                 ease: 'power2.out',
                 onComplete: () => {
-                    accountLabel.textContent = 'Welcome Mike';
+                    accountLabel.textContent = 'Welcome Johnny Eugene ';
                     accountNumber.textContent = '';
                     gsap.to([accountLabel, accountNumber], {
                         opacity: 1,
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (password !== 'shawn@324') {
+        if (password !== 'johnny@324') {
             alert('Incorrect password. Please try again.');
             return;
         }
@@ -356,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('Discover Bank Mobile App initialized');
 });
+
 
 
 
