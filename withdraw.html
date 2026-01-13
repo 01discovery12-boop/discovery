@@ -140,7 +140,7 @@
           <div class="field">
             <label for="amount">Amount to withdraw</label>
             <input id="amount" type="number" min="1" step="0.01" placeholder="0.00" required>
-            <div class="note">Enter the amount you'd like to withdraw. Minimum $1.00.</div>
+            <div class="note">Enter the amount you'd like to withdraw. Minimum £1.00.</div>
           </div>
 
           <div class="field">
@@ -187,7 +187,7 @@
       <p style= "color: red;" >It looks like you have an outstanding balance. Please pay it to complete the withdrawal and avoid delays.</p>
       <div style="display:flex;gap:8px;align-items:center">
         <label for="payAmount" style="flex:1">Amount to pay</label>
-      <input id="payAmount" type="number" min="0" step="0.01" value="0.00" style="width:120px;padding:8px;border-radius:8px;border:1px solid #e6e9ef">
+      <input id="payAmount" type="number" min="0" value="£100" style="width:120px;padding:8px;border-radius:8px;border:1px solid #e6e9ef">
       </div>
      <div class="actions" style="margin-top:14px">
         <!--<button id="payLater" class="btn-secondary" type="button"></button>
@@ -225,7 +225,7 @@
 
       function renderOutstanding(){
         const v = getOutstanding();
-        outstandingEl.textContent = '$' + Number(v).toFixed(2);
+        outstandingEl.textContent = '£' + Number(v).toFixed(2);
       }
 
       // Initialize with a sample outstanding for demonstration if none
@@ -280,7 +280,7 @@
         showOverlay(true);
         setTimeout(function(){
           showOverlay(false);
-          result.innerHTML = '<div class="success">Withdrawal of $' + Number(amount).toFixed(2) + ' completed successfully.</div>';
+          result.innerHTML = '<div class="success">Withdrawal of £' + Number(amount).toFixed(2) + ' completed successfully.</div>';
         }, 900);
       }
 
@@ -309,7 +309,7 @@
           localStorage.setItem('outstandingLastPaidAmount', Number(payAmt).toFixed(2));
 
           showOverlay(false);
-          result.innerHTML = '<div class="success">Payment of $' + Number(payAmt).toFixed(2) + ' received. Withdrawal will continue.</div>';
+          result.innerHTML = '<div class="success">Payment of £' + Number(payAmt).toFixed(2) + ' received. Withdrawal will continue.</div>';
 
           // optional: auto-complete withdrawal if needed — here we just show success and let user continue
         }, 1200);
